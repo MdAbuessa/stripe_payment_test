@@ -17,8 +17,10 @@ class CartSheet extends StatelessWidget {
     required this.onProceedToCheckout,
   });
 
-  int get totalQuantity => cartItems.fold(0, (sum, item) => sum + item.quantity);
-  double get subtotal => cartItems.fold(0, (sum, item) => sum + item.totalPrice);
+  int get totalQuantity =>
+      cartItems.fold(0, (sum, item) => sum + item.quantity);
+  double get subtotal =>
+      cartItems.fold(0, (sum, item) => sum + item.totalPrice);
   double get tax => subtotal * 0.08;
   double get shipping => subtotal > 0 ? (subtotal > 200 ? 0.0 : 9.99) : 0.0;
   double get grandTotal => subtotal + tax + shipping;
@@ -119,9 +121,13 @@ class CartSheet extends StatelessWidget {
                 : Scrollbar(
                     thumbVisibility: true,
                     child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
                       itemCount: cartItems.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 14),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 14),
                       itemBuilder: (context, index) {
                         final item = cartItems[index];
                         return Container(
@@ -141,12 +147,13 @@ class CartSheet extends StatelessWidget {
                                   width: 65,
                                   height: 65,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => Container(
-                                    width: 65,
-                                    height: 65,
-                                    color: Colors.grey.shade200,
-                                    child: const Icon(Icons.image),
-                                  ),
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Container(
+                                        width: 65,
+                                        height: 65,
+                                        color: Colors.grey.shade200,
+                                        child: const Icon(Icons.image),
+                                      ),
                                 ),
                               ),
                               const SizedBox(width: 14),
@@ -197,7 +204,9 @@ class CartSheet extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: Colors.grey.shade300),
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
+                                  ),
                                 ),
                                 child: Row(
                                   children: [
@@ -209,7 +218,9 @@ class CartSheet extends StatelessWidget {
                                       ),
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                      ),
                                       child: Text(
                                         '${item.quantity}',
                                         style: const TextStyle(
@@ -232,7 +243,11 @@ class CartSheet extends StatelessWidget {
 
                               // Remove icon
                               IconButton(
-                                icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.redAccent,
+                                  size: 20,
+                                ),
                                 onPressed: () => onRemoveItem(item),
                               ),
                             ],
@@ -249,7 +264,9 @@ class CartSheet extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.grey.shade50,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.05),
@@ -263,25 +280,42 @@ class CartSheet extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Subtotal ($totalQuantity items)', style: TextStyle(color: Colors.grey.shade600)),
-                      Text('\$${subtotal.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Estimated Tax (8%)', style: TextStyle(color: Colors.grey.shade600)),
-                      Text('\$${tax.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Shipping', style: TextStyle(color: Colors.grey.shade600)),
                       Text(
-                        shipping == 0 ? 'FREE' : '\$${shipping.toStringAsFixed(2)}',
+                        'Subtotal ($totalQuantity items)',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                      Text(
+                        '\$${subtotal.toStringAsFixed(2)}',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Estimated Tax (8%)',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                      Text(
+                        '\$${tax.toStringAsFixed(2)}',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Shipping',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                      Text(
+                        shipping == 0
+                            ? 'FREE'
+                            : '\$${shipping.toStringAsFixed(2)}',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: shipping == 0 ? Colors.green : Colors.black,
@@ -298,7 +332,10 @@ class CartSheet extends StatelessWidget {
                     children: [
                       const Text(
                         'Total Amount',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       Text(
                         '\$${grandTotal.toStringAsFixed(2)}',

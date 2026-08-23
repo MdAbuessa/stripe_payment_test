@@ -2,14 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
+import 'package:stripe_payument/main.dart';
 
 class StripeService {
   StripeService._();
   static final StripeService instance = StripeService._();
-
-  // Test Secret Key provided from Stripe Dashboard
-  final String _secretKey =
-      'sk_test_51U615j4IrbdWrbaWW5QF1YmWuXQfgJilW5fGmfhJQRYjY0XxRY1hqyWvoMQQYfRtEs0PABGEzwsEW1KA5thIsgIw00ODGuaT2c';
 
   /// Calls Stripe REST API to create a Payment Intent
   Future<Map<String, dynamic>?> createPaymentIntent(
@@ -22,7 +19,7 @@ class StripeService {
       final response = await http.post(
         Uri.parse('https://api.stripe.com/v1/payment_intents'),
         headers: {
-          'Authorization': 'Bearer $_secretKey',
+          'Authorization': 'Bearer $secretKey',
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: {
