@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:stripe_payument/models/cart_item.dart';
 
+/// Shopping Cart Bottom Sheet Component
+///
+/// শপিং কার্টের সমস্ত আইটেম প্রর্দশন, সাবটোটাল, ভ্যাট, শিপিং চার্জ এবং মোট বিলের সামারি দেখায়।
 class CartSheet extends StatelessWidget {
   final List<CartItem> cartItems;
   final Function(CartItem) onIncrementQuantity;
@@ -17,17 +20,30 @@ class CartSheet extends StatelessWidget {
     required this.onProceedToCheckout,
   });
 
+  // ===========================================================================
+  // CALCULATION LOGIC
+  // ===========================================================================
+  /// মোট আইটেম সংখ্যা
   int get totalQuantity =>
       cartItems.fold(0, (sum, item) => sum + item.quantity);
+
+  /// মূল পণ্যের সাবটোটাল
   double get subtotal =>
       cartItems.fold(0, (sum, item) => sum + item.totalPrice);
+
+  /// ৮% আনুমানিক ভ্যাট
   double get tax => subtotal * 0.08;
+
+  /// $200 এর বেশি কেনাকাটায় শিপিং চার্জ ফ্রী, অন্যথায় $9.99
   double get shipping => subtotal > 0 ? (subtotal > 200 ? 0.0 : 9.99) : 0.0;
+
+  /// সর্বমোট প্রদেয় বিল (Grand Total)
   double get grandTotal => subtotal + tax + shipping;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.88,
       decoration: const BoxDecoration(
@@ -139,7 +155,7 @@ class CartSheet extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              // Thumbnail
+                              // Thumbnail Image
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
                                 child: Image.network(
@@ -149,11 +165,11 @@ class CartSheet extends StatelessWidget {
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) =>
                                       Container(
-                                        width: 65,
-                                        height: 65,
-                                        color: Colors.grey.shade200,
-                                        child: const Icon(Icons.image),
-                                      ),
+                                    width: 65,
+                                    height: 65,
+                                    color: Colors.grey.shade200,
+                                    child: const Icon(Icons.image),
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 14),
@@ -199,7 +215,7 @@ class CartSheet extends StatelessWidget {
                                 ),
                               ),
 
-                              // Quantity modifier
+                              // Quantity Increment / Decrement Buttons
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -241,7 +257,7 @@ class CartSheet extends StatelessWidget {
                               ),
                               const SizedBox(width: 6),
 
-                              // Remove icon
+                              // Delete Icon Button
                               IconButton(
                                 icon: const Icon(
                                   Icons.delete_outline,
@@ -348,13 +364,18 @@ class CartSheet extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
+
+                  // ===========================================================
+                  // PROCEED TO PAYMENT BUTTON
+                  // ===========================================================
+                  /// এই বাটন চাপলে কার্ট বন্ধ হয়ে পেমেন্ট ফ্লো শুরু হবে।
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pop(context);
-                        onProceedToCheckout();
+                        Navigator.pop(context); // 1. Cart Sheet বন্ধ করে
+                        onProceedToCheckout(); // 2. Stripe Checkout ফ্লো কল করে
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.primaryColor,

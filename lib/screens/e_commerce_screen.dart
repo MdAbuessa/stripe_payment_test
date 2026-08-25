@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:stripe_payument/core/constants/stripe_constants.dart';
+import 'package:stripe_payument/core/services/stripe_service.dart';
 import 'package:stripe_payument/models/cart_item.dart';
 import 'package:stripe_payument/models/product.dart';
-import 'package:stripe_payument/widgets/cart_sheet.dart';
-import 'package:stripe_payument/widgets/payment_modal.dart';
-import 'package:stripe_payument/widgets/payment_success_dialog.dart';
-import 'package:stripe_payument/widgets/product_card.dart';
+import 'package:stripe_payument/widgets/ecommerce/cart_sheet.dart';
+import 'package:stripe_payument/widgets/ecommerce/payment_success_dialog.dart';
+import 'package:stripe_payument/widgets/ecommerce/product_card.dart';
 
-class ECommerchScreen extends StatefulWidget {
-  const ECommerchScreen({super.key});
+/// E-Commerce Shop & Stripe Checkout Screen
+///
+/// প্রোডাক্ট সিলেক্ট, সার্চ, কার্ট স্টেট ম্যানেজমেন্ট এবং Stripe-এর মাধ্যমে পুরো কার্ট চেকআউট ফ্লো।
+class ECommerceScreen extends StatefulWidget {
+  const ECommerceScreen({super.key});
 
   @override
-  State<ECommerchScreen> createState() => _ECommerchScreenState();
+  State<ECommerceScreen> createState() => _ECommerceScreenState();
 }
 
-class _ECommerchScreenState extends State<ECommerchScreen> {
+class _ECommerceScreenState extends State<ECommerceScreen> {
   final List<Product> _products = Product.sampleProducts;
   final List<CartItem> _cartItems = [];
   String _selectedCategory = 'All';
@@ -27,12 +31,18 @@ class _ECommerchScreenState extends State<ECommerchScreen> {
     'Accessories',
   ];
 
+  // ===========================================================================
+  // CART COMPUTED PROPERTIES
+  // ===========================================================================
+  /// কার্টে যুক্ত সর্বমোট আইটেমের সংখ্যা
   int get totalCartCount =>
       _cartItems.fold(0, (sum, item) => sum + item.quantity);
 
+  /// কার্টের সাবটোটাল
   double get cartSubtotal =>
       _cartItems.fold(0, (sum, item) => sum + item.totalPrice);
 
+  /// ভ্যাট ও শিপিং সহ কার্টের সর্বমোট চেকআউট অ্যামাউন্ট
   double get cartGrandTotal {
     final subtotal = cartSubtotal;
     if (subtotal == 0) return 0.0;
@@ -41,6 +51,10 @@ class _ECommerchScreenState extends State<ECommerchScreen> {
     return subtotal + tax + shipping;
   }
 
+  // ===========================================================================
+  // CART ACTIONS & STATE MUTATIONS
+  // ===========================================================================
+  /// প্রোডাক্ট কার্টে যুক্ত করা
   void _addToCart(Product product) {
     setState(() {
       final index = _cartItems.indexWhere(
@@ -104,6 +118,10 @@ class _ECommerchScreenState extends State<ECommerchScreen> {
     });
   }
 
+  // ===========================================================================
+  // BOTTOM SHEET & STRIPE CHECKOUT FLOW
+  // ===========================================================================
+  /// ১. Cart Sheet ওপেন করে ইউজারকে আইটেম ও বিল দেখায়।
   void _openCartSheet() {
     showModalBottomSheet(
       context: context,
@@ -131,30 +149,35 @@ class _ECommerchScreenState extends State<ECommerchScreen> {
               });
               setSheetState(() {});
             },
-            onProceedToCheckout: _openPaymentModal,
+            // ইউজার CartSheet থেকে 'Proceed to Payment' বাটনে ক্লিক করলে Stripe Call হবে
+            onProceedToCheckout: _handleStripeCheckout,
           );
         },
       ),
     );
   }
 
-  void _openPaymentModal() {
+  /// ২. Stripe Payment Sheet কল করে মোট অ্যামাউন্টের পেমেন্ট গ্রহণ করে।
+  Future<void> _handleStripeCheckout() async {
     final amountToPay = cartGrandTotal;
     final totalCount = totalCartCount;
 
-    showModalBottomSheet(
+    if (amountToPay <= 0) return;
+
+    final result = await StripeService.instance.makePayment(
+      amount: amountToPay,
+      currency: StripeConstants.defaultCurrency,
+      itemTitle: 'Cart Checkout ($totalCount items)',
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => PaymentModal(
-        totalAmount: amountToPay,
-        onPaymentSuccess: () {
-          _showPaymentSuccessDialog(amountToPay, totalCount);
-        },
-      ),
     );
+
+    // ৩. পেমেন্ট সফল হলে রসিদ সাকসেস ডায়ালগ দেখানো হবে এবং কার্ট খালি করা হবে
+    if (result != null && result['success'] == true && mounted) {
+      _showPaymentSuccessDialog(amountToPay, totalCount);
+    }
   }
 
+  /// ৪. পেমেন্ট সাকসেস ডায়ালগ প্রর্দশন এবং কার্ট রিসেট
   void _showPaymentSuccessDialog(double totalAmount, int totalCount) {
     showDialog(
       context: context,
@@ -171,6 +194,9 @@ class _ECommerchScreenState extends State<ECommerchScreen> {
     );
   }
 
+  // ===========================================================================
+  // SEARCH & CATEGORY FILTERING
+  // ===========================================================================
   List<Product> get filteredProducts {
     return _products.where((product) {
       final matchesCategory =
@@ -323,7 +349,7 @@ class _ECommerchScreenState extends State<ECommerchScreen> {
               ),
             ),
 
-            // Scrollable Content
+            // Scrollable Product List
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
@@ -465,11 +491,11 @@ class _ECommerchScreenState extends State<ECommerchScreen> {
                             itemCount: filteredProducts.length,
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  childAspectRatio: 0.68,
-                                  crossAxisSpacing: 14,
-                                  mainAxisSpacing: 14,
-                                ),
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.68,
+                              crossAxisSpacing: 14,
+                              mainAxisSpacing: 14,
+                            ),
                             itemBuilder: (context, index) {
                               final product = filteredProducts[index];
                               return ProductCard(

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/// Bike Payment Success Dialog
+///
+/// বাইক কেনাকাটা সম্পন্ন হলে মানিসলিপ সদৃশ সফল পেমেন্ট ডায়ালগ দেখায়।
 class BikePaymentSuccessDialog extends StatelessWidget {
   final String bikeTitle;
   final double amount;
@@ -14,86 +17,80 @@ class BikePaymentSuccessDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Green animated success badge
+            // Success Icon
             Container(
-              padding: const EdgeInsets.all(16),
+              width: 70,
+              height: 70,
               decoration: BoxDecoration(
                 color: Colors.green.shade50,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.green.shade300, width: 2),
+                border: Border.all(color: Colors.green.shade200, width: 2),
               ),
               child: const Icon(
                 Icons.check_circle_rounded,
+                size: 48,
                 color: Colors.green,
-                size: 54,
               ),
             ),
             const SizedBox(height: 16),
+
             const Text(
-              'Stripe Payment Success!',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              'Payment Successful!',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 6),
             Text(
-              'Verified transaction logged on Stripe Dashboard',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              'Your bike order has been confirmed',
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
             ),
             const SizedBox(height: 20),
 
-            // Transaction receipt card
+            // Receipt Details
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.grey.shade200),
               ),
               child: Column(
                 children: [
-                  ReceiptRow(
-                    title: 'Item Purchased:',
-                    value: bikeTitle,
-                    isBold: true,
-                  ),
+                  _buildDetailRow('Bike Name:', bikeTitle, isBold: true),
                   const SizedBox(height: 8),
-                  ReceiptRow(
-                    title: 'Amount Paid:',
-                    value: '\$${amount.toStringAsFixed(2)}',
+                  _buildDetailRow('Transaction ID:', paymentId),
+                  const SizedBox(height: 8),
+                  _buildDetailRow('Payment Method:', 'Stripe (Card)'),
+                  const Divider(height: 20),
+                  _buildDetailRow(
+                    'Amount Paid:',
+                    '\$${amount.toStringAsFixed(2)}',
                     isPrimary: true,
-                  ),
-                  const SizedBox(height: 8),
-                  ReceiptRow(
-                    title: 'Payment ID:',
-                    value: paymentId,
-                    isSmall: true,
-                  ),
-                  const SizedBox(height: 8),
-                  const ReceiptRow(
-                    title: 'Gateway:',
-                    value: 'Stripe Test API',
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
 
+            // Close Button
             SizedBox(
               width: double.infinity,
               height: 46,
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
+                  backgroundColor: theme.primaryColor,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -101,10 +98,7 @@ class BikePaymentSuccessDialog extends StatelessWidget {
                 ),
                 child: const Text(
                   'Done',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
               ),
             ),
@@ -113,44 +107,29 @@ class BikePaymentSuccessDialog extends StatelessWidget {
       ),
     );
   }
-}
 
-class ReceiptRow extends StatelessWidget {
-  final String title;
-  final String value;
-  final bool isBold;
-  final bool isPrimary;
-  final bool isSmall;
-
-  const ReceiptRow({
-    super.key,
-    required this.title,
-    required this.value,
-    this.isBold = false,
-    this.isPrimary = false,
-    this.isSmall = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildDetailRow(
+    String title,
+    String value, {
+    bool isBold = false,
+    bool isPrimary = false,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
-          style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+          style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
         ),
         Flexible(
           child: Text(
             value,
-            textAlign: TextAlign.end,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontWeight: (isBold || isPrimary)
-                  ? FontWeight.bold
-                  : FontWeight.normal,
-              fontSize: isPrimary ? 15 : (isSmall ? 11 : 12),
+              fontWeight:
+                  (isBold || isPrimary) ? FontWeight.bold : FontWeight.normal,
+              fontSize: isPrimary ? 15 : 12,
               color: isPrimary ? Colors.green.shade700 : Colors.black87,
             ),
           ),

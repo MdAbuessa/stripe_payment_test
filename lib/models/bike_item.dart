@@ -1,3 +1,5 @@
+/// Bike Item Model
+/// বাইক শপের প্রতিটি আইটেমের ইনফরমেশন ধারণের মডেল।
 class BikeItem {
   final String id;
   final String title;

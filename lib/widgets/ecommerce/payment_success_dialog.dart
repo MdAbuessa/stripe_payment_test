@@ -1,6 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
+/// E-Commerce Payment Success Dialog Component
+///
+/// ই-কমার্স কেনাকাটা সম্পূর্ণ হলে রসিদসহ নিশ্চিতকরণ বার্তা দেখায়।
 class PaymentSuccessDialog extends StatelessWidget {
   final double totalAmount;
   final int itemCount;
@@ -25,7 +28,7 @@ class PaymentSuccessDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Success icon with circle glow
+            // Success Check Icon with Glow
             Container(
               width: 80,
               height: 80,
@@ -44,22 +47,16 @@ class PaymentSuccessDialog extends StatelessWidget {
 
             const Text(
               'Payment Successful!',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               'Thank you for your purchase',
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
             ),
             const SizedBox(height: 20),
 
-            // Order Receipt summary card
+            // Order Receipt Details
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -85,7 +82,7 @@ class PaymentSuccessDialog extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Done button
+            // Done Button
             SizedBox(
               width: double.infinity,
               height: 48,
@@ -104,10 +101,7 @@ class PaymentSuccessDialog extends StatelessWidget {
                 ),
                 child: const Text(
                   'Continue Shopping',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -117,22 +111,24 @@ class PaymentSuccessDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildReceiptRow(String title, String value,
-      {bool isBold = false, bool isPrimary = false}) {
+  Widget _buildReceiptRow(
+    String title,
+    String value, {
+    bool isBold = false,
+    bool isPrimary = false,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
-          style: TextStyle(
-            color: Colors.grey.shade700,
-            fontSize: 13,
-          ),
+          style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
         ),
         Text(
           value,
           style: TextStyle(
-            fontWeight: (isBold || isPrimary) ? FontWeight.bold : FontWeight.normal,
+            fontWeight:
+                (isBold || isPrimary) ? FontWeight.bold : FontWeight.normal,
             fontSize: isPrimary ? 16 : 13,
             color: isPrimary ? Colors.green.shade700 : Colors.black87,
           ),

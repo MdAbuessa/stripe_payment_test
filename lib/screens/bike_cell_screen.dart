@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:stripe_payument/core/constants/stripe_constants.dart';
+import 'package:stripe_payument/core/services/stripe_service.dart';
 import 'package:stripe_payument/models/bike_item.dart';
-import 'package:stripe_payument/services/stripe_service.dart';
-import 'package:stripe_payument/widgets/bike_card.dart';
-import 'package:stripe_payument/widgets/bike_payment_success_dialog.dart';
+import 'package:stripe_payument/widgets/bike/bike_card.dart';
+import 'package:stripe_payument/widgets/bike/bike_payment_success_dialog.dart';
 
+/// Bike Sale Screen Component
+///
+/// প্রতিটি বাইক প্রোডাক্টের জন্য একক আইটেম সরাসরি Stripe-এর মাধ্যমে ক্রয় করার স্ক্রিন।
 class BikeCellScreen extends StatefulWidget {
   const BikeCellScreen({super.key});
 
@@ -12,8 +16,10 @@ class BikeCellScreen extends StatefulWidget {
 }
 
 class _BikeCellScreenState extends State<BikeCellScreen> {
+  /// পেমেন্ট চলাকালীন ডুপ্লিকেট ক্লিক ঠেকাতে ফ্ল্যাগ
   bool _isProcessingPayment = false;
 
+  /// স্যাম্পল বাইক প্রোডাক্ট লিস্ট
   final List<BikeItem> _bikes = [
     BikeItem(
       id: '1',
@@ -65,7 +71,7 @@ class _BikeCellScreenState extends State<BikeCellScreen> {
     ),
     BikeItem(
       id: '7',
-      title: 'Harley Davidson 883',
+      title: 'Harley Davidson Custom',
       subtitle: '883cc Evolution V-Twin',
       price: 100.00,
       imageUrl:
@@ -73,14 +79,18 @@ class _BikeCellScreenState extends State<BikeCellScreen> {
     ),
     BikeItem(
       id: '8',
-      title: 'Harley Davidson 883',
-      subtitle: '883cc Evolution V-Twin',
+      title: 'Yamaha Sport Pro',
+      subtitle: '155cc VVA Engine',
       price: 100.00,
       imageUrl:
           'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=600&auto=format&fit=crop&q=80',
     ),
   ];
 
+  // ===========================================================================
+  // STRIPE PAYMENT HANDLER FOR SINGLE BIKE ITEM
+  // ===========================================================================
+  /// বাইকের 'Buy' বাটন চাপলে Stripe Payment প্রসেস শুরু করে।
   Future<void> _handleStripePayment(BikeItem bike) async {
     if (_isProcessingPayment) return;
 
@@ -89,13 +99,15 @@ class _BikeCellScreenState extends State<BikeCellScreen> {
     });
 
     try {
+      // 1. StripeService-এর মাধ্যমে পেমেন্ট কমপ্লিট করা
       final result = await StripeService.instance.makePayment(
         amount: bike.price,
-        currency: 'usd',
+        currency: StripeConstants.defaultCurrency,
         itemTitle: bike.title,
         context: context,
       );
 
+      // 2. পেমেন্ট সফল হলে কনফার্মেশন ডায়ালগ প্রর্দশন করা
       if (result != null && result['success'] == true && mounted) {
         _showSuccessDialog(
           bikeTitle: bike.title,
@@ -112,6 +124,7 @@ class _BikeCellScreenState extends State<BikeCellScreen> {
     }
   }
 
+  /// পেমেন্ট সফল ডায়ালগ দেখানো
   void _showSuccessDialog({
     required String bikeTitle,
     required double amount,
